@@ -12,6 +12,7 @@ SensorXYZ accel(SENSOR_ID_ACC);
 SensorXYZ gyro(SENSOR_ID_GYRO);
 Sensor temp(SENSOR_ID_TEMP);
 Sensor gas(SENSOR_ID_GAS);
+SensorBSEC bsec(SENSOR_ID_BSEC);
 
 void setup()
 {
@@ -24,6 +25,9 @@ void setup()
   gyro.configure(1, 0);
   temp.configure(1, 0);
   gas.configure(1,0);
+  if (BHY2.hasSensor(SENSOR_ID_BSEC)) {
+    bsec.configure(1,0);
+  }
 }
 
 void loop()
@@ -40,5 +44,15 @@ void loop()
     Serial.println(String("gyroscope: ") + gyro.toString());
     Serial.println(String("temperature: ") + String(temp.value(),3));
     Serial.println(String("gas: ") + String(gas.value(),3));
+    
+    // Note: some fields of BSEC printed below might be always 0 if 
+    // SENSOR_DATA_FIXED_LENGTH (defined in "SensorTypes.h") is smaller than the actual frame size of the BSEC sensor, 
+    // SENSOR_DATA_FIXED_LENGTH could be enlarged to the size of the BSEC sensor frame, which is 18 bytes for BSEC new format (SID=115) 
+    // or 29 bytes for legacy format (SID=171 SENSOR_ID_BSEC)
+    // for the new format (SID=115 SENSOR_ID_BSEC_LEGACY), if the compensated values (comp_t, comp_h, comp_g) are not important to you, you could keep 
+    // SENSOR_DATA_FIXED_LENGTH to the default value which is 10, this will save bandwidth for other sensors
+    if (BHY2.hasSensor(SENSOR_ID_BSEC)) {
+      Serial.println(String("bsec: ") + bsec.toString());
+    }
   }
 }
